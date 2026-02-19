@@ -28,17 +28,38 @@ void Player::handleInput(float dt)
 		setPosition({ 50,0 });
 		m_velocity = { 0,0 };
 	}
+
+	if (m_input->isKeyDown(sf::Keyboard::Scancode::W) && m_isOnGround == true)
+	{
+		m_acceleration.y -= JUMP_FORCE * SPEED;
+		m_isOnGround = false;
+	}
 }
 
 void Player::update(float dt)
 {
-	// newtonian model
 	m_acceleration.y += GRAVITY;
 	m_velocity += dt * m_acceleration;
+
+	m_oldPosition = getPosition();
 	move(m_velocity);
 }
 
 void Player::collisionResponse(GameObject& collider)
 {
+	auto overlap = getCollisionBox().findIntersection(collider.getCollisionBox());
+	if (!overlap) return;
+
 	
+
+	if (overlap->size.x > overlap->size.y)
+	{
+		m_velocity.y = 0;
+		setPosition(sf::Vector2f{ getPosition().x, collider.getPosition().y - getCollisionBox().size.y});
+		m_isOnGround = true;		
+	}
+	else if (m_oldPosition.y > collider.getPosition().y)
+	{
+		m_velocity.x *= -overlap->size.x * COEFF_RESTITUTION;
+	}
 }

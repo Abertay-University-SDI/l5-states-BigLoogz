@@ -34,7 +34,7 @@ Level1::Level1(sf::RenderWindow& hwnd, Input& in, GameState& gs) :
 	tileSet.push_back(tile);
 
 	std::vector<int> tileMapLocations{
-		b,	b,	20,	b,	66,	b,	b,	b,	b,	112,
+		b,	b,	20,	b,	b,	b,	b,	b,	b,	112,
 		b,	21, 104,22,	22,23,	b,	b,	b,	131,
 		1,	142,142,142,142,142,3,	b,	81,	83
 	};
@@ -65,6 +65,15 @@ void Level1::update(float dt)
 {
 	m_player.update(dt);
 	
+	std::vector<GameObject>& tiles = *m_tileMap.getLevel();
+
+	for (auto& t : tiles)
+	{
+		if (t.isCollider() && Collision::checkBoundingBox(m_player, t))
+		{
+			m_player.collisionResponse(t);
+		}
+	}
 }
 
 // Render Level1
